@@ -1,8 +1,8 @@
 version: '2'
 services:
   apache:
-    image: rafaelcgstz/magento2
-    # build: .
+#    image: rafaelcgstz/magento2
+    build: .
     ports:
       - "80:80" # web
       - "9001:9000" # xdebug
@@ -20,7 +20,7 @@ services:
     links:
       - db
     networks:
-      - <project_name>-network
+      - magento2-network
 
   db:
     image: mariadb
@@ -32,9 +32,9 @@ services:
       - MYSQL_USER=magento
       - MYSQL_PASSWORD=magento
     volumes:
-      - dbdata:/var/lib/mysql
+      - ./dbdata:/var/lib/mysql
     networks:
-      - <project_name>-network
+      - magento2-network
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
@@ -46,21 +46,21 @@ services:
     ports:
      - 8080:80
     networks:
-      - <project_name>-network
+      - magento2-network
 
   redis:
     image: redis
     ports:
      - 6379
     networks:
-      - <project_name>-network
+      - magento2-network
 
   redis-session:
     image: redis
     ports:
      - 6379
     networks:
-      - <project_name>-network
+      - magento2-network
 
   mailhog:
     image: mailhog/mailhog
@@ -68,10 +68,25 @@ services:
       - 1025:1025
       - 8025:8025
     networks:
-      - <project_name>-network
+      - magento2-network
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "8081:15672"
+      - "5672:5672"
+    volumes:
+      - ./rabbitmq/storage:/var/lib/rabbitmq
+    environment:
+      - RABBITMQ_ERLANG_COOKIE=secretkey
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+      - CLUSTERED=true
+    networks:
+      - magento2-network
 
 networks:
-  <project_name>-network:
+  magento2-network:
     driver: bridge
 
 volumes:

@@ -15,4 +15,4 @@ services:
     ports:
       - 9200:9200
     networks:
-      - <project_name>-network
+      - magento2-network

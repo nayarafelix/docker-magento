@@ -1,4 +1,4 @@
-FROM php:7.1-apache
+FROM php:7.4-fpm-buster
 
 MAINTAINER Rafael Corrêa Gomes <rafaelcgstz@gmail.com>
 
@@ -22,7 +22,7 @@ RUN apt-get update \
 	apt-utils \
 	gnupg \
 	redis-tools \
-	mysql-client \
+	mariadb-client \
 	git \
 	vim \
 	wget \
@@ -35,17 +35,25 @@ RUN apt-get update \
 	bash-completion \
 	&& apt-get clean
 
+RUN apt-get update && apt-get install -y libmcrypt-dev \
+    && pecl install mcrypt-1.0.2 \
+    && docker-php-ext-enable mcrypt
+
+RUN apt-get install -y zip libzip-dev \
+  && docker-php-ext-configure zip --with-libzip \
+  && docker-php-ext-install zip
+
 # Install Magento Dependencies
 
 RUN docker-php-ext-configure \
   	gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/; \
   	docker-php-ext-install \
+  	sockets \
   	opcache \
   	gd \
   	bcmath \
   	intl \
   	mbstring \
-  	mcrypt \
   	pdo_mysql \
   	soap \
   	xsl \
@@ -63,7 +71,7 @@ RUN apt-get update \
 
 # Install Node, NVM, NPM and Grunt
 
-RUN curl -sL https://deb.nodesource.com/setup_6.x | bash - \
+RUN curl -sL https://deb.nodesource.com/setup_current.x | bash - \
   	&& apt-get install -y nodejs build-essential \
     && curl https://raw.githubusercontent.com/creationix/nvm/v0.16.1/install.sh | sh \
     && npm i -g grunt-cli yarn
@@ -71,7 +79,7 @@ RUN curl -sL https://deb.nodesource.com/setup_6.x | bash - \
 # Install Composer
 
 RUN	curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin/ --filename=composer
-RUN composer global require hirak/prestissimo
+#RUN composer global require hirak/prestissimo
 
 # Install Code Sniffer
 
@@ -98,6 +106,10 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -y install golang-go \
 RUN wget https://files.magerun.net/n98-magerun2.phar \
 	&& chmod +x ./n98-magerun2.phar \
 	&& mv ./n98-magerun2.phar /usr/local/bin/
+
+# Install Nano
+
+RUN apt-get install nano
 
 # Configuring system
 

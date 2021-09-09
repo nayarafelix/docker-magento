@@ -1,4 +1,4 @@
 /src/*
+/dbdata/*
 .DS_Store
 /.idea
-/docker-compose.yml
