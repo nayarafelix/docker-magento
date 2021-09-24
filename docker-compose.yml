@@ -2,7 +2,9 @@ version: '2'
 services:
   apache:
 #    image: rafaelcgstz/magento2
-    build: .
+    build:
+      context: .
+      dockerfile: build/apache/Dockerfile
     ports:
       - "80:80" # web
       - "9001:9000" # xdebug
@@ -82,6 +84,28 @@ services:
       - RABBITMQ_DEFAULT_USER=guest
       - RABBITMQ_DEFAULT_PASS=guest
       - CLUSTERED=true
+    networks:
+      - magento2-network
+
+  elasticsearch:
+    image: elasticsearch:7.6.0
+#    build:
+#      context: .
+#      dockerfile: build/elasticsearch/Dockerfile
+    environment:
+      - cluster.name=docker-cluster
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - node.name=node-1
+      - cluster.initial_master_nodes=node-1
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - ./elasticsearchdata:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
     networks:
       - magento2-network
 

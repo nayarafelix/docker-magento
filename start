@@ -1,1 +1,2 @@
-docker-compose -f docker-compose.yml -f docker-compose.elasticsearch.yml up -d
+#!/usr/bin/env bash
+docker-compose up -d
