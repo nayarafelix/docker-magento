@@ -24,3 +24,6 @@
 !/README.md
 !/.github
 !/.github/*
+
+/app/code/Magento/TestModule*
+CustomApiForTest/
